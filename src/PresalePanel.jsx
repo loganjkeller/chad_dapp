@@ -10,10 +10,6 @@ import { bsc } from "wagmi/chains";
 import { parseEther } from "viem";
 import { PRESALE_ABI } from "./presaleAbi";
 import { CONTRACTS, USD_GOAL } from "./constants";
-import heroImg from "./assets/chad_hero.png";
-import chadLegend from "./assets/chad_legend.png";
-import chadMission from "./assets/chad_mission.png";
-import chadFut from "./assets/chad_fut.png";
 import StakingPanel from "./StakingPanel";
 
 
@@ -437,7 +433,7 @@ const { data: isCanceled } = useReadContract({
       <div className="card" style={{ marginTop: 40, textAlign: "center" }}>
         {/* Hero image */}
         <img 
-          src={heroImg} 
+          src="/chad_hero.png"
           alt="CHAD Hero" 
           style={{ width: "100%", borderRadius: 16, marginBottom: 24 }}
         />
@@ -458,7 +454,7 @@ This isn’t just a coin. This is a legend in the making.
         {/* Section 1: The Legend */}
         <div style={{ marginBottom: 40 }}>
           <img 
-            src={chadLegend} 
+            src="/chad_legend.png" 
             alt="CHAD Legend" 
             style={{ width: "100%", maxWidth: 480, borderRadius: 12, margin: "0 auto 20px" }}
           />
@@ -478,7 +474,7 @@ This isn’t just a coin. This is a legend in the making.
         {/* Section 2: The Mission */}
         <div style={{ marginBottom: 40 }}>
           <img 
-            src={chadMission}
+            src="/chad_mission.png"
             alt="CHAD Mission" 
            style={{
     width: "100%",     // fill container width
@@ -501,7 +497,7 @@ This isn’t just a coin. This is a legend in the making.
         {/* Section 3: The Future */}
         <div style={{ marginBottom: 40 }}>
           <img 
-            src={chadFut} 
+            src="/chad_fut.png"
             alt="CHAD Future" 
             style={{
     width: "100%",     // fill container width
