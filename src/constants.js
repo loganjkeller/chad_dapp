@@ -1,0 +1,6 @@
+export const CONTRACTS = {
+  presale: "0x6BC3daDd1CA7F925266d4c93b377DAf2438F9766",
+  treasury: "0x4B5926D8a07b03895f3f56E4eD3Ee22E06f4e011",
+  Staking: "0xD8D850BfC139bc733Dc9541d1d75A12e79609533"	
+};
+export const USD_GOAL = 5_000_000;
