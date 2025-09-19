@@ -1,32 +1,41 @@
+// src/presaleAbi.js
 export const PRESALE_ABI = [
-  { "inputs": [], "name": "P", "outputs": [
-    { "internalType":"uint64","name":"start","type":"uint64" },
-    { "internalType":"uint64","name":"end","type":"uint64" },
-    { "internalType":"uint128","name":"softCap","type":"uint128" },
-    { "internalType":"uint128","name":"hardCap","type":"uint128" },
-    { "internalType":"uint128","name":"minBuy","type":"uint128" },
-    { "internalType":"uint128","name":"maxBuy","type":"uint128" },
-    { "internalType":"uint32","name":"liquidityPercent","type":"uint32" },
-    { "internalType":"uint64","name":"lpLockSeconds","type":"uint64" },
-    { "internalType":"uint128","name":"listingRate","type":"uint128" },
-    { "internalType":"bool","name":"whitelistEnabled","type":"bool" }
-  ], "stateMutability":"view", "type":"function" },
+  {
+    type: "function",
+    name: "P",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [
+      { name: "start",            type: "uint64"  },
+      { name: "end",              type: "uint64"  },
+      { name: "softCap",          type: "uint128" },
+      { name: "hardCap",          type: "uint128" },
+      { name: "minBuy",           type: "uint128" },
+      { name: "maxBuy",           type: "uint128" },
+      { name: "liquidityPercent", type: "uint32"  },
+      { name: "lpLockSeconds",    type: "uint64"  },
+      // NOTE: there's NO presaleRate in the struct
+      { name: "listingRate",      type: "uint128" },
+      { name: "whitelistEnabled", type: "bool"    }
+    ]
+  },
 
-  { "inputs": [], "name": "currentUsdPerCHAD", "outputs":[{"internalType":"uint256","name":"","type":"uint256"}], "stateMutability":"view", "type":"function" },
-  { "inputs": [], "name": "currentRate",       "outputs":[{"internalType":"uint256","name":"","type":"uint256"}], "stateMutability":"view", "type":"function" },
-  { "inputs": [], "name": "usdRaised",         "outputs":[{"internalType":"uint256","name":"","type":"uint256"}], "stateMutability":"view", "type":"function" },
+  // State
+  { type: "function", name: "totalRaised", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
+  { type: "function", name: "contributed", stateMutability: "view", inputs: [{ type: "address" }], outputs: [{ type: "uint256" }] },
+  { type: "function", name: "purchased",   stateMutability: "view", inputs: [{ type: "address" }], outputs: [{ type: "uint256" }] },
+  { type: "function", name: "finalized",   stateMutability: "view", inputs: [], outputs: [{ type: "bool" }] },
+  { type: "function", name: "canceled",    stateMutability: "view", inputs: [], outputs: [{ type: "bool" }] },
 
-  { "inputs": [], "name": "totalRaised", "outputs":[{"internalType":"uint256","name":"","type":"uint256"}], "stateMutability":"view", "type":"function" },
-  { "inputs": [{"internalType":"address","name":"","type":"address"}], "name":"contributed","outputs":[{"internalType":"uint256","name":"","type":"uint256"}], "stateMutability":"view","type":"function" },
-  { "inputs": [{"internalType":"address","name":"","type":"address"}], "name":"purchased",  "outputs":[{"internalType":"uint256","name":"","type":"uint256"}], "stateMutability":"view","type":"function" },
+  // 🔥 Add the dynamic views your UI needs
+  { type: "function", name: "currentRate",     stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] }, // CHAD per 1 BNB (1e18)
+  { type: "function", name: "currentUsdPerCHAD", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] }, // USD/CHAD (1e18)
+  { type: "function", name: "usdRaised",       stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] }, // USD raised (1e18)
 
-  { "inputs": [], "name": "buy",   "outputs": [], "stateMutability":"payable",    "type":"function" },
-  { "inputs": [], "name": "claim", "outputs": [], "stateMutability":"nonpayable", "type":"function" },
-
-  { "inputs": [], "name": "finalized", "outputs":[{"internalType":"bool","name":"","type":"bool"}], "stateMutability":"view", "type":"function" },
-  { "inputs": [], "name": "canceled",  "outputs":[{"internalType":"bool","name":"","type":"bool"}], "stateMutability":"view", "type":"function" },
-
-  { "inputs": [], "name":"finalize","outputs":[],"stateMutability":"nonpayable","type":"function" },
-  { "inputs": [], "name":"cancelPresale","outputs":[],"stateMutability":"nonpayable","type":"function" },
-  { "inputs":[{"internalType":"bool","name":"on","type":"bool"}],"name":"setWhitelistEnabled","outputs":[],"stateMutability":"nonpayable","type":"function" }
+  // Writes
+  { type: "function", name: "buy",             stateMutability: "payable",    inputs: [], outputs: [] },
+  { type: "function", name: "claim",           stateMutability: "nonpayable", inputs: [], outputs: [] },
+  { type: "function", name: "finalize",        stateMutability: "nonpayable", inputs: [], outputs: [] },
+  { type: "function", name: "cancelPresale",   stateMutability: "nonpayable", inputs: [], outputs: [] },
+  { type: "function", name: "setWhitelistEnabled", stateMutability: "nonpayable", inputs: [{ name: "on", type: "bool" }], outputs: [] }
 ];
