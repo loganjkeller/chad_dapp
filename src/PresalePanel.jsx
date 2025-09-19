@@ -423,10 +423,19 @@ export default function PresalePanel() {
                  {/* CHAD Story / Branding */}
             
 {/* Quick Facts */}
-<div>
-  <h3 style={{ margin: "0 0 16px", fontSize: 20, color: "#ffd700" }}>
-    Official Email: chadthecoin@gmail.com
-  </h3>
+{/* Official Email */}
+<div style={{ textAlign: "center", margin: "20px 0" }}>
+  <p style={{ 
+    fontSize: "16px", 
+    color: "#ffd700", 
+    fontWeight: 500, 
+    background: "rgba(255, 215, 0, 0.1)", 
+    padding: "8px 16px", 
+    borderRadius: "8px", 
+    display: "inline-block"
+  }}>
+    📧 Official Email: <span style={{ fontWeight: 600 }}>chadthecoin@gmail.com</span>
+  </p>
 </div>
 {/* Trust & Transparency Card */}
 <div 
