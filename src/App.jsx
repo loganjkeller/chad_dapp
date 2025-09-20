@@ -7,6 +7,8 @@ import PresalePanel from "./PresalePanel";
 
 import { useChainId } from "wagmi";
 import { bsc } from "wagmi/chains";
+import { useAccount } from "wagmi";
+import { useEffect } from "react";
 
 // If you have a logo file, keep this import.
 import logo from "./assets/chad_logo.png";
@@ -53,25 +55,14 @@ function clearStaleWalletSession() {
 export default function App() {
   const chainId = useChainId();
   const onBnb = chainId === bsc.id;
-import { useEffect } from 'react';
-import { useAccount } from 'wagmi';
+  const { address } = useAccount();
 
-// …inside App()
-const { address: acct } = useAccount();
-
-useEffect(() => {
-  // If there’s no connected address but cache says “connected”, nuke cache.
-  if (!acct) clearStaleWalletSession();
-}, [acct]);
-
-// Also when the tab regains focus (common on mobile after switching apps)
-useEffect(() => {
-  const onFocus = () => {
-    if (!acct) clearStaleWalletSession();
-  };
-  window.addEventListener('focus', onFocus);
-  return () => window.removeEventListener('focus', onFocus);
-}, [acct]);	
+  // Automatically clear stale sessions if no wallet is connected
+  useEffect(() => {
+    if (!address) {
+      clearStaleWalletSession();
+    }
+  }, [address]);	
 
   return (
     <div className="shell">
