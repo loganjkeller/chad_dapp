@@ -27,6 +27,19 @@ function resetWalletCacheAndOpen() {
   if (el) el.click();
 }
 
+function resetWalletCache() {
+  try {
+    Object.keys(localStorage).forEach((k) => {
+      if (k.includes("wagmi") || k.includes("wc@2")) {
+        localStorage.removeItem(k);
+      }
+    });
+    console.log("🔄 Cleared wallet session cache");
+  } catch (err) {
+    console.warn("Could not clear wallet cache", err);
+  }
+}
+
 export default function App() {
   const chainId = useChainId();
   const onBnb = chainId === bsc.id;
@@ -46,6 +59,12 @@ export default function App() {
 
         {/* Web3Modal’s connect button (registered in wallet.js) */}
         <w3m-button balance="hide"></w3m-button>
+		<button 
+  		onClick={resetWalletCache} 
+  		style={{ marginLeft: 8, fontSize: 12 }}
+>
+  🔄 Reset
+</button>
       </header>
 
       <main className="main">
