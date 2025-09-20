@@ -9,6 +9,7 @@ import { useChainId } from "wagmi";
 import { bsc } from "wagmi/chains";
 import { useAccount, useDisconnect } from "wagmi";
 import { useEffect } from "react";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 // If you have a logo file, keep this import.
 import logo from "./assets/chad_logo.png";
@@ -58,7 +59,22 @@ export default function App() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
 
-  const openModal = () => document.querySelector("w3m-button")?.click();
+  const { open } = useWeb3Modal();
+
+
+ const openModal = () => {
+   try {
+     // Open Web3Modal directly (reliable even if the button is hidden)
+     open({ view: 'Connect' });
+   } catch {
+     // Fallbacks (rarely needed)
+     document.querySelector("w3m-button")?.click();
+     if (window?.ethereum?.request) {
+       window.ethereum.request({ method: "eth_requestAccounts" }).catch(() => {});
+     }
+   }
+ };
+	
   const hardDisconnect = () => {
     try {
       disconnect?.(); // wagmi disconnect
