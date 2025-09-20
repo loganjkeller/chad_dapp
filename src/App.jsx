@@ -14,6 +14,18 @@ export default function App() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
 
+  const openModal = () => document.querySelector("w3m-button")?.click();
+  const hardDisconnect = () => {
+    try {
+      disconnect?.();
+      Object.keys(localStorage).forEach((k) => {
+        if (k.startsWith("wagmi") || k.startsWith("wc:") || k.startsWith("walletconnect")) {
+          localStorage.removeItem(k);
+        }
+      });
+    } catch {}
+  };
+
   return (
     <div className="shell">
       <header className="topbar">
@@ -25,68 +37,35 @@ export default function App() {
           </span>
         </div>
 
-        {/* Connect / Address */}
-        {isConnected ? (
-          <div className="wallet-wrap">
-            <button
-              className="wallet-pill"
-              title="Connected wallet"
-              type="button"
-            >
-              {address.slice(0, 6)}…{address.slice(-4)}
-            </button>
-            <button
-              className="wallet-x"
-              onClick={() => disconnect?.()}
-              title="Disconnect"
-              aria-label="Disconnect"
-              type="button"
-            >
-              ✕
-            </button>
-          </div>
-        ) : (
-         {/* Keep the real Web3Modal button hidden; we trigger it programmatically */}
-<w3m-button balance="hide" style={{ display: "none" }}></w3m-button>
+        {/* keep Web3Modal button hidden; we trigger it programmatically */}
+        <w3m-button balance="hide" style={{ display: "none" }}></w3m-button>
 
-<div className="wallet-wrap">
-  {isConnected ? (
-    <button
-      className="addr-pill"
-      onClick={() => document.querySelector('w3m-button')?.click()}
-      title="Manage wallet"
-    >
-      <span className="dot" />
-      <span className="addr-text">{address?.slice(0, 6)}…{address?.slice(-4)}</span>
-      <span
-        className="addr-x"
-        onClick={(e) => {
-          e.stopPropagation();        // don’t open modal when pressing X
-          try {
-            disconnect?.();
-            Object.keys(localStorage).forEach((k) => {
-              if (k.startsWith('wagmi') || k.startsWith('wc:') || k.startsWith('walletconnect')) {
-                localStorage.removeItem(k);
-              }
-            });
-          } catch {}
-        }}
-        aria-label="Disconnect"
-        title="Disconnect"
-      >
-        ×
-      </span>
-    </button>
-  ) : (
-    <button
-      className="btn connect"
-      onClick={() => document.querySelector('w3m-button')?.click()}
-    >
-      Connect Wallet
-    </button>
-  )}
-</div>
-        )}
+        {/* Connect / Address */}
+        <div className="wallet-wrap">
+          {isConnected ? (
+            <button
+              className="addr-pill"
+              onClick={openModal}
+              title="Manage wallet"
+              type="button"
+            >
+              <span className="dot" />
+              <span className="addr-text">{address.slice(0, 6)}…{address.slice(-4)}</span>
+              <span
+                className="addr-x"
+                onClick={(e) => { e.stopPropagation(); hardDisconnect(); }}
+                aria-label="Disconnect"
+                title="Disconnect"
+              >
+                ×
+              </span>
+            </button>
+          ) : (
+            <button className="btn connect" onClick={openModal} type="button">
+              Connect Wallet
+            </button>
+          )}
+        </div>
       </header>
 
       <main className="main">
