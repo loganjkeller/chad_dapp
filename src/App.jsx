@@ -6,30 +6,36 @@ import PresalePanel from "./PresalePanel";
 
 import { useChainId, useAccount, useDisconnect } from "wagmi";
 import { bsc } from "wagmi/chains";
+import { useWeb3Modal } from "@web3modal/wagmi/react"; // ✅ use the official opener
 import logo from "./assets/chad_logo.png";
 
-// Robust, browser-safe opener for the Web3Modal
-async function openModal() {
-  // ensure the custom element is registered
-  if (!customElements.get("w3m-button")) {
-    try { await customElements.whenDefined("w3m-button"); } catch {}
-  }
+// robust opener: try Web3Modal API → hidden button → MetaMask fallback
+async function openModalSafe(openW3M) {
+  try {
+    if (typeof openW3M === "function") {
+      await openW3M({ view: "Connect" });
+      return;
+    }
+  } catch {} // if hook not ready, fall through
 
-  // find our hidden instance (retry briefly)
-  let el = document.getElementById("w3m-hidden");
-  const t0 = Date.now();
-  while (!el && Date.now() - t0 < 1200) {
-    await new Promise(r => setTimeout(r, 50));
-    el = document.getElementById("w3m-hidden");
-  }
-
-  if (el) {
-    // Safari-friendly: click the inner real button first
-    try { el.shadowRoot?.querySelector("button")?.click(); } catch {}
-    // fallback: click host
-    try { el.click(); } catch {}
-    return;
-  }
+  // fallback to clicking our hidden w3m-button
+  try {
+    // ensure the custom element is defined
+    if (!customElements.get("w3m-button")) {
+      try { await customElements.whenDefined("w3m-button"); } catch {}
+    }
+    let el = document.getElementById("w3m-hidden");
+    const t0 = Date.now();
+    while (!el && Date.now() - t0 < 800) {
+      await new Promise(r => setTimeout(r, 40));
+      el = document.getElementById("w3m-hidden");
+    }
+    if (el) {
+      try { el.shadowRoot?.querySelector("button")?.click(); } catch {}
+      el.click();
+      return;
+    }
+  } catch {}
 
   // last fallback: native provider prompt
   if (window?.ethereum?.request) {
@@ -43,9 +49,11 @@ export default function App() {
 
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
+  const { open } = useWeb3Modal();             // ✅ get Web3Modal opener
 
-  // optional: stronger disconnect that also clears cached WC/wagmi keys
-  function hardDisconnect() {
+  // header button handlers
+  const onOpenClick = () => openModalSafe(open);
+  const hardDisconnect = () => {
     try {
       disconnect?.();
       Object.keys(localStorage).forEach(k => {
@@ -54,7 +62,7 @@ export default function App() {
         }
       });
     } catch {}
-  }
+  };
 
   return (
     <div className="shell">
@@ -67,7 +75,7 @@ export default function App() {
           </span>
         </div>
 
-        {/* Keep one Web3Modal element rendered (off-screen but present) */}
+        {/* Keep exactly ONE hidden Web3Modal button for fallback clicks */}
         <w3m-button
           id="w3m-hidden"
           balance="hide"
@@ -87,7 +95,7 @@ export default function App() {
           {isConnected ? (
             <button
               className="addr-pill"
-              onClick={openModal}
+              onClick={onOpenClick}
               title="Manage wallet"
               type="button"
             >
@@ -103,7 +111,7 @@ export default function App() {
               </span>
             </button>
           ) : (
-            <button className="btn connect" onClick={openModal} type="button">
+            <button className="btn connect" onClick={onOpenClick} type="button">
               Connect Wallet
             </button>
           )}
