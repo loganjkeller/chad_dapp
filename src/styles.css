@@ -59,3 +59,54 @@ body {
 .progress { height: 8px; background: #222; border-radius: 999px; overflow: hidden; }
 .progress > span { display: block; height: 8px; background: var(--gold); }
 
+/* Wallet pill styles */
+.wallet-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wallet-pill {
+  font-size: 14px;
+  line-height: 1;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #3a3a3a;
+  background: #121212;
+  color: #eee;
+  cursor: default;
+}
+
+.wallet-x {
+  padding: 6px 8px;
+  line-height: 1;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid #3a3a3a;
+  color: #bbb;
+  cursor: pointer;
+}
+.wallet-x:hover { color: #fff; border-color: #555; }
+
+/* Mobile tweaks */
+@media (max-width: 480px) {
+  .brand-logo { width: 28px; height: 28px; }   /* if your class exists */
+  .brand-title { font-size: 16px; }
+  .netpill { font-size: 11px; padding: 2px 6px; }
+
+  .topbar { padding: 10px 12px; }
+  .main { padding: 12px; }
+
+  .wallet-pill {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+  .wallet-x {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+
+  /* Optional: smaller headings/text in cards */
+  .card h2, .card h3 { font-size: 16px; }
+  .card { padding: 12px; }
+}
