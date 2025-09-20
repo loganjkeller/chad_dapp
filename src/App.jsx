@@ -7,7 +7,6 @@ import PresalePanel from "./PresalePanel";
 import { useEffect } from "react";
 import { useChainId, useAccount, useDisconnect, useReconnect } from "wagmi";
 import { bsc } from "wagmi/chains";
-import { useWeb3Modal } from "@web3modal/wagmi/react";   // ⬅️ add this
 import logo from "./assets/chad_logo.png";
 
 export default function App() {
@@ -17,29 +16,27 @@ export default function App() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const { reconnect } = useReconnect();
-  const { open } = useWeb3Modal();                       // ⬅️ add this
 
-  // Restore saved session after refresh/open
+  // Restore any existing WC/wagmi session after refresh/open
   useEffect(() => { reconnect(); }, [reconnect]);
 
-  // Open Web3Modal (most reliable)
+  // Single place to open Web3Modal by clicking the HIDDEN w3m-button
   const openModal = () => {
-    try {
-      open({ view: "Connect" });                         // ⬅️ primary path
-    } catch {
-      // Fallbacks if something blocks the hook on certain browsers
-      const el = document.getElementById("w3m-hidden");
-      try { el?.shadowRoot?.querySelector("button")?.click(); } catch {}
-      el?.click();
-      if (window?.ethereum?.request) {
-        window.ethereum.request({ method: "eth_requestAccounts" }).catch(() => {});
-      }
+    const el = document.getElementById("w3m-hidden");
+    // Try clicking the real inner button (helps Safari / shadow-dom)
+    try { el?.shadowRoot?.querySelector("button")?.click(); } catch {}
+    // Fallback: click host element
+    if (el) el.click();
+    // Last resort: native provider prompt
+    else if (window?.ethereum?.request) {
+      window.ethereum.request({ method: "eth_requestAccounts" }).catch(() => {});
     }
   };
 
   const hardDisconnect = () => {
     try {
       disconnect?.();
+      // Clear cached sessions so mobile browsers don't “ghost connect”
       Object.keys(localStorage).forEach((k) => {
         if (k.startsWith("wagmi") || k.startsWith("wc:") || k.startsWith("walletconnect")) {
           localStorage.removeItem(k);
@@ -59,14 +56,17 @@ export default function App() {
           </span>
         </div>
 
-        {/* Keep exactly one Web3Modal element in the DOM (hidden) */}
+        {/* Keep exactly ONE Web3Modal element (hidden) in the whole app */}
         <w3m-button id="w3m-hidden" balance="hide" style={{ display: "none" }}></w3m-button>
 
+        {/* Header wallet control */}
         <div className="wallet-wrap">
           {isConnected ? (
             <button className="addr-pill" onClick={openModal} title="Manage wallet" type="button">
               <span className="dot" />
-              <span className="addr-text">{address.slice(0, 6)}…{address.slice(-4)}</span>
+              <span className="addr-text">
+                {address.slice(0, 6)}…{address.slice(-4)}
+              </span>
               <span
                 className="addr-x"
                 onClick={(e) => { e.stopPropagation(); hardDisconnect(); }}
