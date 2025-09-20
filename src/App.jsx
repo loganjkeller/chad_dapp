@@ -1,35 +1,37 @@
 // src/App.jsx
-import "./wallet.js";          // Web3Modal init happens here
+import "./wallet.js";          // Web3Modal init (createWeb3Modal) happens here
 import "./styles.css";
 import "./index.css";
 import PresalePanel from "./PresalePanel";
 
-import { useEffect } from "react";
-import { useChainId, useAccount, useDisconnect, useReconnect } from "wagmi";
+import { useChainId, useAccount, useDisconnect } from "wagmi";
 import { bsc } from "wagmi/chains";
 import logo from "./assets/chad_logo.png";
 
-/** Wait for the hidden <w3m-button> to be defined & in the DOM, then click it */
-async function openModalViaHiddenButton() {
-  // 1) Wait until the custom element is defined (in case it loads a bit later)
+// Robust, browser-safe opener for the Web3Modal
+async function openModal() {
+  // ensure the custom element is registered
   if (!customElements.get("w3m-button")) {
-    try {
-      await customElements.whenDefined("w3m-button");
-    } catch {}
+    try { await customElements.whenDefined("w3m-button"); } catch {}
   }
 
-  // 2) Find the *one* hidden button we render in App.jsx
-  const el = document.getElementById("w3m-hidden");
+  // find our hidden instance (retry briefly)
+  let el = document.getElementById("w3m-hidden");
+  const t0 = Date.now();
+  while (!el && Date.now() - t0 < 1200) {
+    await new Promise(r => setTimeout(r, 50));
+    el = document.getElementById("w3m-hidden");
+  }
 
   if (el) {
-    // Try clicking the inner real button (helps Safari)
+    // Safari-friendly: click the inner real button first
     try { el.shadowRoot?.querySelector("button")?.click(); } catch {}
-    // Click the element itself as well (covers other browsers)
-    el.click();
+    // fallback: click host
+    try { el.click(); } catch {}
     return;
   }
 
-  // 3) Last fallback: open MetaMask native prompt
+  // last fallback: native provider prompt
   if (window?.ethereum?.request) {
     window.ethereum.request({ method: "eth_requestAccounts" }).catch(() => {});
   }
@@ -41,20 +43,12 @@ export default function App() {
 
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
-  const { reconnect } = useReconnect();
 
-  // Try to restore the session on refresh/open
-  useEffect(() => { reconnect(); }, [reconnect]);
-
-  function openModal() {
-    openModalViaHiddenButton();
-  }
-
+  // optional: stronger disconnect that also clears cached WC/wagmi keys
   function hardDisconnect() {
     try {
       disconnect?.();
-      // Clear cached sessions (wagmi + walletconnect)
-      Object.keys(localStorage).forEach((k) => {
+      Object.keys(localStorage).forEach(k => {
         if (k.startsWith("wagmi") || k.startsWith("wc:") || k.startsWith("walletconnect")) {
           localStorage.removeItem(k);
         }
@@ -73,10 +67,22 @@ export default function App() {
           </span>
         </div>
 
-        {/* Keep exactly ONE hidden Web3Modal button in the app */}
-        <w3m-button id="w3m-hidden" balance="hide" style={{ display: "none" }}></w3m-button>
+        {/* Keep one Web3Modal element rendered (off-screen but present) */}
+        <w3m-button
+          id="w3m-hidden"
+          balance="hide"
+          style={{
+            position: "absolute",
+            left: "-9999px",
+            top: "-9999px",
+            width: 0,
+            height: 0,
+            opacity: 0,
+            visibility: "hidden"
+          }}
+        ></w3m-button>
 
-        {/* Connect / Address */}
+        {/* Header wallet control */}
         <div className="wallet-wrap">
           {isConnected ? (
             <button
@@ -86,9 +92,7 @@ export default function App() {
               type="button"
             >
               <span className="dot" />
-              <span className="addr-text">
-                {address.slice(0, 6)}…{address.slice(-4)}
-              </span>
+              <span className="addr-text">{address.slice(0, 6)}…{address.slice(-4)}</span>
               <span
                 className="addr-x"
                 onClick={(e) => { e.stopPropagation(); hardDisconnect(); }}
