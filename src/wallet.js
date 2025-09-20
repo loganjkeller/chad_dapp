@@ -13,15 +13,7 @@ export const wagmiConfig = defaultWagmiConfig({
     description: 'Buy CHAD on BNB',
     url: window.location.origin,
     icons: []
-  },
- enableWalletConnect: true,
-  autoConnect: true,  // <— restore session automatically
-  connectors: (connectors) =>
-    connectors.map((c) =>
-      c.id === 'injected'
-        ? { ...c, options: { shimDisconnect: true } } // <— remember MetaMask sessions
-        : c
-    )
+  }
 })
 
 // Initialize the modal only if we actually have a projectId
