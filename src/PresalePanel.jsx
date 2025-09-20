@@ -368,7 +368,7 @@ export default function PresalePanel() {
 
       {/* Buy / Claim actions */}
       <div className="card" style={{ marginTop: 12 }}>
-        + {!address ? (
+         {!address ? (
    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
      <button onClick={openWallet} className="btn">Connect Wallet</button>
    </div>
