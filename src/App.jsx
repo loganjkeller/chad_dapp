@@ -1,5 +1,5 @@
 // src/App.jsx
-import "./wallet.js";
+import "./wallet.js";          // (createWeb3Modal is called here)
 import "./styles.css";
 import "./index.css";
 import PresalePanel from "./PresalePanel";
@@ -17,29 +17,17 @@ export default function App() {
   const { disconnect } = useDisconnect();
   const { reconnect } = useReconnect();
 
-  // 🔁 Rehydrate any saved wallet session on first load / tab focus
+  // 🔁 Ensure header gets the session back after refresh/open
   useEffect(() => { reconnect(); }, [reconnect]);
-  useEffect(() => {
-    const onFocus = () => { if (!isConnected) reconnect(); };
-    window.addEventListener("visibilitychange", onFocus);
-    window.addEventListener("focus", onFocus);
-    return () => {
-      window.removeEventListener("visibilitychange", onFocus);
-      window.removeEventListener("focus", onFocus);
-    };
-  }, [isConnected, reconnect]);
 
-  const openModal = () => {
-    const el = document.querySelector("w3m-button");
-    if (el) { try { el.click(); return; } catch {} }
-    if (window?.ethereum?.request) {
-      window.ethereum.request({ method: "eth_requestAccounts" }).catch(() => {});
-    }
-  };
+  // One hidden Web3Modal button we can programmatically click
+  // (keep exactly one of these in the whole app)
+  const openModal = () => document.querySelector("w3m-button")?.click();
 
   const hardDisconnect = () => {
     try {
       disconnect?.();
+      // also clear cached WC/wagmi sessions so Safari/mobile don't get stuck
       Object.keys(localStorage).forEach((k) => {
         if (k.startsWith("wagmi") || k.startsWith("wc:") || k.startsWith("walletconnect")) {
           localStorage.removeItem(k);
@@ -59,21 +47,30 @@ export default function App() {
           </span>
         </div>
 
-        {/* one authoritative Web3Modal button (you can hide it if you prefer) */}
-        <w3m-button balance="hide" size="sm"></w3m-button>
+        {/* keep Web3Modal element in DOM (hidden) so openModal() works */}
+        <w3m-button balance="hide" style={{ display: "none" }}></w3m-button>
 
-        {/* Optional custom pill — if you prefer this, keep it and hide w3m-button with display:none */}
-        {/* <div className="wallet-wrap">
+        {/* Header wallet control driven by wagmi state */}
+        <div className="wallet-wrap">
           {isConnected ? (
             <button className="addr-pill" onClick={openModal} title="Manage wallet" type="button">
               <span className="dot" />
-              <span className="addr-text">{address.slice(0,6)}…{address.slice(-4)}</span>
-              <span className="addr-x" onClick={(e)=>{e.stopPropagation(); hardDisconnect();}} title="Disconnect">×</span>
+              <span className="addr-text">{address.slice(0, 6)}…{address.slice(-4)}</span>
+              <span
+                className="addr-x"
+                onClick={(e) => { e.stopPropagation(); hardDisconnect(); }}
+                aria-label="Disconnect"
+                title="Disconnect"
+              >
+                ×
+              </span>
             </button>
           ) : (
-            <button className="btn connect" onClick={openModal} type="button">Connect Wallet</button>
+            <button className="btn connect" onClick={openModal} type="button">
+              Connect Wallet
+            </button>
           )}
-        </div> */}
+        </div>
       </header>
 
       <main className="main">
