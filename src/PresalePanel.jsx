@@ -28,6 +28,17 @@ function openWallet() {
 
 function resetWalletCacheAndOpen() {
   try {
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith('wagmi') || k.startsWith('wc:') || k.startsWith('walletconnect')) {
+        localStorage.removeItem(k);
+      }
+    });
+  } catch {}
+  document.querySelector('w3m-button')?.click();
+}
+
+function resetWalletCacheAndOpen() {
+  try {
     // Clear wagmi + walletconnect local storage keys only
     Object.keys(localStorage).forEach(k => {
       if (
