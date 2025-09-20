@@ -11,6 +11,21 @@ import { bsc } from "wagmi/chains";
 // If you have a logo file, keep this import.
 import logo from "./assets/chad_logo.png";
 
+function resetWalletCacheAndOpen() {
+  try {
+    // Clear wagmi + walletconnect local storage keys only
+    Object.keys(localStorage).forEach(k => {
+      if (
+        k.startsWith('wagmi') ||
+        k.startsWith('wc:') ||
+        k.startsWith('walletconnect')
+      ) localStorage.removeItem(k);
+    });
+  } catch {}
+  // Try to open Web3Modal
+  const el = document.querySelector('w3m-button');
+  if (el) el.click();
+}
 
 export default function App() {
   const chainId = useChainId();
