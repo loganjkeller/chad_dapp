@@ -5,7 +5,7 @@ import "./index.css";
 import PresalePanel from "./PresalePanel";
 
 
-import { useChainId, useAccount } from "wagmi";
+import { useChainId } from "wagmi";
 import { bsc } from "wagmi/chains";
 import { useAccount } from "wagmi";
 import { useEffect } from "react";
