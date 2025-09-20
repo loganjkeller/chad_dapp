@@ -4,7 +4,7 @@ import "./styles.css";
 import "./index.css";
 import PresalePanel from "./PresalePanel";
 
-import { useChainId, useAccount } from "wagmi";
+import { useChainId, useAccount, useDisconnect } from "wagmi";
 import { bsc } from "wagmi/chains";
 import logo from "./assets/chad_logo.png";
 
@@ -12,6 +12,7 @@ export default function App() {
   const chainId = useChainId();
   const onBnb = chainId === bsc.id;
   const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
 
   return (
     <div className="shell">
@@ -24,11 +25,26 @@ export default function App() {
           </span>
         </div>
 
-        {/* Web3Modal connect button */}
+        {/* Connect / Address */}
         {isConnected ? (
-          <span style={{ fontSize: 14, padding: "6px 12px", border: "1px solid #444", borderRadius: 8 }}>
-            {address.slice(0, 6)}…{address.slice(-4)}
-          </span>
+          <div className="wallet-wrap">
+            <button
+              className="wallet-pill"
+              title="Connected wallet"
+              type="button"
+            >
+              {address.slice(0, 6)}…{address.slice(-4)}
+            </button>
+            <button
+              className="wallet-x"
+              onClick={() => disconnect?.()}
+              title="Disconnect"
+              aria-label="Disconnect"
+              type="button"
+            >
+              ✕
+            </button>
+          </div>
         ) : (
           <w3m-button balance="hide"></w3m-button>
         )}
