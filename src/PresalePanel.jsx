@@ -366,11 +366,11 @@ export default function PresalePanel() {
         </div>
       </div>
 
-      {/* Buy / Claim actions */}
+            {/* Buy / Claim actions */}
       <div className="card" style={{ marginTop: 12 }}>
         {!address ? (
           <div className="muted" style={{ fontSize: 13 }}>
-            No wallet connected. Use the <b>Connect Wallet</b> button at the top.
+            No wallet connected — use the “Connect Wallet” button at the top.
           </div>
         ) : (
           <>
