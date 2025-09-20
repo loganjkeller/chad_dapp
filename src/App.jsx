@@ -1,5 +1,5 @@
 // src/App.jsx
-import "./wallet.js";          // (createWeb3Modal is called here)
+import "./wallet.js";          // createWeb3Modal is called here
 import "./styles.css";
 import "./index.css";
 import PresalePanel from "./PresalePanel";
@@ -17,17 +17,15 @@ export default function App() {
   const { disconnect } = useDisconnect();
   const { reconnect } = useReconnect();
 
-  // 🔁 Ensure header gets the session back after refresh/open
+  // Restore saved session on refresh/open
   useEffect(() => { reconnect(); }, [reconnect]);
 
-  // One hidden Web3Modal button we can programmatically click
-  // (keep exactly one of these in the whole app)
-  const openModal = () => document.querySelector("w3m-button")?.click();
+  // Open the ONE hidden Web3Modal
+  const openModal = () => document.getElementById("w3m-hidden")?.click();
 
   const hardDisconnect = () => {
     try {
       disconnect?.();
-      // also clear cached WC/wagmi sessions so Safari/mobile don't get stuck
       Object.keys(localStorage).forEach((k) => {
         if (k.startsWith("wagmi") || k.startsWith("wc:") || k.startsWith("walletconnect")) {
           localStorage.removeItem(k);
@@ -47,15 +45,17 @@ export default function App() {
           </span>
         </div>
 
-        {/* keep Web3Modal element in DOM (hidden) so openModal() works */}
-        <w3m-button balance="hide" style={{ display: "none" }}></w3m-button>
+        {/* The ONLY Web3Modal element in the whole app (kept hidden) */}
+        <w3m-button id="w3m-hidden" balance="hide" style={{ display: "none" }}></w3m-button>
 
-        {/* Header wallet control driven by wagmi state */}
+        {/* Header wallet control */}
         <div className="wallet-wrap">
           {isConnected ? (
             <button className="addr-pill" onClick={openModal} title="Manage wallet" type="button">
               <span className="dot" />
-              <span className="addr-text">{address.slice(0, 6)}…{address.slice(-4)}</span>
+              <span className="addr-text">
+                {address.slice(0, 6)}…{address.slice(-4)}
+              </span>
               <span
                 className="addr-x"
                 onClick={(e) => { e.stopPropagation(); hardDisconnect(); }}
