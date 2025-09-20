@@ -364,7 +364,7 @@ export default function PresalePanel() {
         {!address ? (
   <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
     <w3m-button balance="hide"></w3m-button>
-    <button onClick={openWallet} className="btn"><-</button>
+    <button onClick={openWallet} className="btn">Connect Wallet</button>
   </div>
         ) : (
           <>
