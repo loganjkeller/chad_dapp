@@ -6,7 +6,6 @@ import PresalePanel from "./PresalePanel";
 
 import { useChainId, useAccount, useDisconnect } from "wagmi";
 import { bsc } from "wagmi/chains";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import logo from "./assets/chad_logo.png";
 
 export default function App() {
