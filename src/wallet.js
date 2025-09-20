@@ -13,7 +13,8 @@ export const wagmiConfig = defaultWagmiConfig({
     description: 'Buy CHAD on BNB',
     url: window.location.origin,
     icons: []
-  }
+  },
+  autoConnect: true
 })
 
 // Initialize the modal only if we actually have a projectId
