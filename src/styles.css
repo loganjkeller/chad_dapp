@@ -171,3 +171,52 @@ body {
   .card h2, .card h3 { font-size: 16px; }
   .card { padding: 12px; }
 }
+
+/* Make the wrapper a click target and position the hidden <w3m-button> on top */
+.wallet-wrap.hotspot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Visual pill */
+.addr-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #3a3a3a;
+  background: #121212;
+  color: #eee;
+  cursor: pointer;           /* User clicks here... */
+  position: relative;
+  z-index: 1;                /* ...but the invisible w3m-button below captures it */
+}
+
+.addr-pill .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #4ade80;
+  display: inline-block;
+}
+
+.addr-text { font-size: 14px; }
+
+/* Small X button for disconnect */
+.addr-x {
+  background: transparent;
+  border: 0;
+  color: #bbb;
+  font-size: 14px;
+  padding: 0 4px;
+  line-height: 1;
+  cursor: pointer;
+}
+.addr-x:hover { color: #fff; }
+
+/* Mobile polish (optional, already similar to what you had) */
+@media (max-width: 480px) {
+  .addr-pill { padding: 6px 10px; }
+  .addr-text { font-size: 12px; }
+  .brand-title { font-size: 16px; }
+}
