@@ -19,8 +19,15 @@ function fmt(n, d = 4) {
 }
 
 function openWallet() {
-  const el = document.querySelector("w3m-button");
-  if (el) { el.click(); return; }
+  // always target the ONE hidden Web3Modal button in App.jsx
+  const el = document.getElementById('w3m-hidden');
+  if (el) {
+    // try clicking the inner real button (helps Safari)
+    try { el.shadowRoot?.querySelector('button')?.click(); } catch {}
+    el.click();
+    return;
+  }
+  // final fallback: native provider connect
   if (window?.ethereum?.request) {
     window.ethereum.request({ method: "eth_requestAccounts" }).catch(() => {});
   }
@@ -361,12 +368,11 @@ export default function PresalePanel() {
 
       {/* Buy / Claim actions */}
       <div className="card" style={{ marginTop: 12 }}>
-        {!address ? (
-  <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-    <w3m-button balance="hide"></w3m-button>
-    <button onClick={openWallet} className="btn">Connect Wallet</button>
-  </div>
-        ) : (
+        + {!address ? (
+   <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+     <button onClick={openWallet} className="btn">Connect Wallet</button>
+   </div>
+ ) : (
           <>
             <div className="row" style={{ marginBottom: 8 }}>
               <div className="muted" style={{ fontSize: 13 }}>Buy CHAD (pay in BNB)</div>
