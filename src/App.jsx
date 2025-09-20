@@ -1,5 +1,5 @@
 // src/App.jsx
-import "./wallet.js";
+import "./wallet.js";          // your Web3Modal init (createWeb3Modal) lives here
 import "./styles.css";
 import "./index.css";
 import PresalePanel from "./PresalePanel";
@@ -13,24 +13,25 @@ export default function App() {
   const onBnb = chainId === bsc.id;
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
-  const { open } = useWeb3Modal();
 
-  // Always try Web3Modal first; fallback to hidden button or eth_requestAccounts
-  const openModal = async () => {
-    try {
-      await open({ view: "Connect" });
-    } catch {
-      document.querySelector("w3m-button")?.click();
-      if (window?.ethereum?.request) {
-        window.ethereum.request({ method: "eth_requestAccounts" }).catch(() => {});
-      }
+  // Minimal + robust "open modal"
+  const openModal = () => {
+    // try Web3Modal’s button
+    const el = document.querySelector("w3m-button");
+    if (el) {
+      el.click();
+      return;
+    }
+    // fallback to MetaMask prompt
+    if (window?.ethereum?.request) {
+      window.ethereum.request({ method: "eth_requestAccounts" }).catch(() => {});
     }
   };
 
   const hardDisconnect = () => {
     try {
       disconnect?.(); // wagmi disconnect
-      // clear cache
+      // Clear cached sessions (wagmi + walletconnect)
       Object.keys(localStorage).forEach((k) => {
         if (
           k.startsWith("wagmi") ||
@@ -49,18 +50,15 @@ export default function App() {
         <div className="brand">
           <img src={logo} alt="CHAD" className="brand-logo" />
           <span className="brand-title">CHADCOIN</span>
-          <span
-            className="netpill"
-            style={{ color: onBnb ? "#9fd69f" : "#ffb3b3" }}
-          >
+          <span className="netpill" style={{ color: onBnb ? "#9fd69f" : "#ffb3b3" }}>
             {onBnb ? "BNB Mainnet" : "Switch to BNB"}
           </span>
         </div>
 
-        {/* hidden real Web3Modal button */}
+        {/* keep Web3Modal button in the DOM (hidden) so we can click it programmatically */}
         <w3m-button balance="hide" style={{ display: "none" }}></w3m-button>
 
-        {/* Connect / Address pill */}
+        {/* Connect / Address */}
         <div className="wallet-wrap">
           {isConnected ? (
             <button
@@ -75,10 +73,7 @@ export default function App() {
               </span>
               <span
                 className="addr-x"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  hardDisconnect();
-                }}
+                onClick={(e) => { e.stopPropagation(); hardDisconnect(); }}
                 aria-label="Disconnect"
                 title="Disconnect"
               >
