@@ -9,7 +9,6 @@ import { useChainId } from "wagmi";
 import { bsc } from "wagmi/chains";
 import { useAccount, useDisconnect } from "wagmi";
 import { useEffect } from "react";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 // If you have a logo file, keep this import.
 import logo from "./assets/chad_logo.png";
