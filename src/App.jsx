@@ -1,5 +1,5 @@
 // src/App.jsx
-import "./wallet.js";          // createWeb3Modal is called here
+import "./wallet.js";          // createWeb3Modal runs here
 import "./styles.css";
 import "./index.css";
 import PresalePanel from "./PresalePanel";
@@ -7,6 +7,7 @@ import PresalePanel from "./PresalePanel";
 import { useEffect } from "react";
 import { useChainId, useAccount, useDisconnect, useReconnect } from "wagmi";
 import { bsc } from "wagmi/chains";
+import { useWeb3Modal } from "@web3modal/wagmi/react";   // ⬅️ add this
 import logo from "./assets/chad_logo.png";
 
 export default function App() {
@@ -16,12 +17,25 @@ export default function App() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const { reconnect } = useReconnect();
+  const { open } = useWeb3Modal();                       // ⬅️ add this
 
-  // Restore saved session on refresh/open
+  // Restore saved session after refresh/open
   useEffect(() => { reconnect(); }, [reconnect]);
 
-  // Open the ONE hidden Web3Modal
-  const openModal = () => document.getElementById("w3m-hidden")?.click();
+  // Open Web3Modal (most reliable)
+  const openModal = () => {
+    try {
+      open({ view: "Connect" });                         // ⬅️ primary path
+    } catch {
+      // Fallbacks if something blocks the hook on certain browsers
+      const el = document.getElementById("w3m-hidden");
+      try { el?.shadowRoot?.querySelector("button")?.click(); } catch {}
+      el?.click();
+      if (window?.ethereum?.request) {
+        window.ethereum.request({ method: "eth_requestAccounts" }).catch(() => {});
+      }
+    }
+  };
 
   const hardDisconnect = () => {
     try {
@@ -45,17 +59,14 @@ export default function App() {
           </span>
         </div>
 
-        {/* The ONLY Web3Modal element in the whole app (kept hidden) */}
+        {/* Keep exactly one Web3Modal element in the DOM (hidden) */}
         <w3m-button id="w3m-hidden" balance="hide" style={{ display: "none" }}></w3m-button>
 
-        {/* Header wallet control */}
         <div className="wallet-wrap">
           {isConnected ? (
             <button className="addr-pill" onClick={openModal} title="Manage wallet" type="button">
               <span className="dot" />
-              <span className="addr-text">
-                {address.slice(0, 6)}…{address.slice(-4)}
-              </span>
+              <span className="addr-text">{address.slice(0, 6)}…{address.slice(-4)}</span>
               <span
                 className="addr-x"
                 onClick={(e) => { e.stopPropagation(); hardDisconnect(); }}
