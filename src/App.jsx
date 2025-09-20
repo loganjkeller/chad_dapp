@@ -17,33 +17,51 @@ export default function App() {
   const { disconnect } = useDisconnect();
   const { reconnect } = useReconnect();
 
-  // Restore any existing WC/wagmi session after refresh/open
+  // Restore any existing session on load (WC/wagmi)
   useEffect(() => { reconnect(); }, [reconnect]);
 
-  // Single place to open Web3Modal by clicking the HIDDEN w3m-button
-  const openModal = () => {
-    const el = document.getElementById("w3m-hidden");
-    // Try clicking the real inner button (helps Safari / shadow-dom)
-    try { el?.shadowRoot?.querySelector("button")?.click(); } catch {}
-    // Fallback: click host element
-    if (el) el.click();
-    // Last resort: native provider prompt
-    else if (window?.ethereum?.request) {
-      window.ethereum.request({ method: "eth_requestAccounts" }).catch(() => {});
+  async function openModal() {
+    // 1) Ensure the custom element is registered
+    if (!customElements.get("w3m-button")) {
+      console.warn("Web3Modal <w3m-button> not defined yet — check wallet.js & VITE_WC_PROJECT_ID");
+      // wait briefly in case wallet.js is still loading
+      await new Promise(r => setTimeout(r, 50));
     }
-  };
 
-  const hardDisconnect = () => {
+    // 2) Wait until the element is actually in the DOM
+    let el = document.getElementById("w3m-hidden");
+    if (!el) {
+      await new Promise(r => setTimeout(r, 50));
+      el = document.getElementById("w3m-hidden");
+    }
+
+    // 3) Try hard: click inner shadow button (Safari), then host
+    try { el?.shadowRoot?.querySelector("button")?.click(); } catch {}
+    if (el) {
+      el.click();
+      // give it one more nudge after render
+      setTimeout(() => {
+        try { el.shadowRoot?.querySelector("button")?.click(); } catch {}
+      }, 50);
+      return;
+    }
+
+    // 4) Last-resort fallback: native provider prompt
+    if (window?.ethereum?.request) {
+      try { await window.ethereum.request({ method: "eth_requestAccounts" }); } catch {}
+    }
+  }
+
+  function hardDisconnect() {
     try {
       disconnect?.();
-      // Clear cached sessions so mobile browsers don't “ghost connect”
       Object.keys(localStorage).forEach((k) => {
         if (k.startsWith("wagmi") || k.startsWith("wc:") || k.startsWith("walletconnect")) {
           localStorage.removeItem(k);
         }
       });
     } catch {}
-  };
+  }
 
   return (
     <div className="shell">
@@ -56,10 +74,9 @@ export default function App() {
           </span>
         </div>
 
-        {/* Keep exactly ONE Web3Modal element (hidden) in the whole app */}
+        {/* Exactly one Web3Modal element; hidden but clickable programmatically */}
         <w3m-button id="w3m-hidden" balance="hide" style={{ display: "none" }}></w3m-button>
 
-        {/* Header wallet control */}
         <div className="wallet-wrap">
           {isConnected ? (
             <button className="addr-pill" onClick={openModal} title="Manage wallet" type="button">
