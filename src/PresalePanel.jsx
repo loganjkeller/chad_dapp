@@ -368,11 +368,17 @@ export default function PresalePanel() {
 
       {/* Buy / Claim actions */}
       <div className="card" style={{ marginTop: 12 }}>
-         {!address ? (
-   <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-     <button onClick={openWallet} className="btn">Connect Wallet</button>
-   </div>
- ) : (
+         // Replace the disconnected UI with this:
+{!address ? (
+  <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+    <button
+      onClick={() => document.querySelector("w3m-button")?.click()}
+      className="btn"
+    >
+      Connect Wallet
+    </button>
+  </div>
+) : (
           <>
             <div className="row" style={{ marginBottom: 8 }}>
               <div className="muted" style={{ fontSize: 13 }}>Buy CHAD (pay in BNB)</div>
