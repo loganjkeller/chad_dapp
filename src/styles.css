@@ -156,7 +156,7 @@ body {
   .netpill { font-size: 11px; padding: 2px 6px; }
 
   .topbar { padding: 10px 12px; }
-  .main { padding: 12px; }
+  .main { padding: 1px; }
 
   .wallet-pill {
     font-size: 12px;
