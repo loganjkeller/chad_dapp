@@ -26,6 +26,22 @@ function openWallet() {
   }
 }
 
+function resetWalletCacheAndOpen() {
+  try {
+    // Clear wagmi + walletconnect local storage keys only
+    Object.keys(localStorage).forEach(k => {
+      if (
+        k.startsWith('wagmi') ||
+        k.startsWith('wc:') ||
+        k.startsWith('walletconnect')
+      ) localStorage.removeItem(k);
+    });
+  } catch {}
+  // Try to open Web3Modal
+  const el = document.querySelector('w3m-button');
+  if (el) el.click();
+}
+
 function Countdown({ label, target }) {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   useEffect(() => {
@@ -351,10 +367,26 @@ export default function PresalePanel() {
       {/* Buy / Claim actions */}
       <div className="card" style={{ marginTop: 12 }}>
         {!address ? (
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <w3m-button balance="hide"></w3m-button>
-            <button onClick={openWallet} className="btn">Connect Wallet</button>
-          </div>
+  <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+    <w3m-button balance="hide"></w3m-button>
+    <button onClick={openWallet} className="btn">Connect Wallet</button>
+
+    {/* tiny reset link */}
+    <button
+      onClick={resetWalletCacheAndOpen}
+      style={{
+        background: "transparent",
+        border: "none",
+        color: "#999",
+        fontSize: 12,
+        textDecoration: "underline",
+        cursor: "pointer"
+      }}
+      title="If your wallet doesn’t open, tap to reset the connection."
+    >
+      having trouble? reset wallet connection
+    </button>
+  </div>
         ) : (
           <>
             <div className="row" style={{ marginBottom: 8 }}>
