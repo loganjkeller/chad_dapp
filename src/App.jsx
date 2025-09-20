@@ -46,7 +46,46 @@ export default function App() {
             </button>
           </div>
         ) : (
-          <w3m-button balance="hide"></w3m-button>
+         {/* Keep the real Web3Modal button hidden; we trigger it programmatically */}
+<w3m-button balance="hide" style={{ display: "none" }}></w3m-button>
+
+<div className="wallet-wrap">
+  {isConnected ? (
+    <button
+      className="addr-pill"
+      onClick={() => document.querySelector('w3m-button')?.click()}
+      title="Manage wallet"
+    >
+      <span className="dot" />
+      <span className="addr-text">{address?.slice(0, 6)}…{address?.slice(-4)}</span>
+      <span
+        className="addr-x"
+        onClick={(e) => {
+          e.stopPropagation();        // don’t open modal when pressing X
+          try {
+            disconnect?.();
+            Object.keys(localStorage).forEach((k) => {
+              if (k.startsWith('wagmi') || k.startsWith('wc:') || k.startsWith('walletconnect')) {
+                localStorage.removeItem(k);
+              }
+            });
+          } catch {}
+        }}
+        aria-label="Disconnect"
+        title="Disconnect"
+      >
+        ×
+      </span>
+    </button>
+  ) : (
+    <button
+      className="btn connect"
+      onClick={() => document.querySelector('w3m-button')?.click()}
+    >
+      Connect Wallet
+    </button>
+  )}
+</div>
         )}
       </header>
 
