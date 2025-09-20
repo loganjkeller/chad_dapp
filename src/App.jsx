@@ -14,15 +14,18 @@ export default function App() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
 
-  // Minimal + robust "open modal"
+  // Robust "open modal" (works on Safari/iOS)
   const openModal = () => {
-    // try Web3Modal’s button
-    const el = document.querySelector("w3m-button");
-    if (el) {
-      el.click();
+    const host = document.getElementById("w3m-hidden");
+    if (host) {
+      try {
+        // click the real button inside shadow DOM first
+        host.shadowRoot?.querySelector("button")?.click();
+      } catch {}
+      host.click(); // fallback
       return;
     }
-    // fallback to MetaMask prompt
+    // final fallback: native provider prompt
     if (window?.ethereum?.request) {
       window.ethereum.request({ method: "eth_requestAccounts" }).catch(() => {});
     }
@@ -31,13 +34,9 @@ export default function App() {
   const hardDisconnect = () => {
     try {
       disconnect?.(); // wagmi disconnect
-      // Clear cached sessions (wagmi + walletconnect)
+      // clear wagmi + walletconnect cache
       Object.keys(localStorage).forEach((k) => {
-        if (
-          k.startsWith("wagmi") ||
-          k.startsWith("wc:") ||
-          k.startsWith("walletconnect")
-        ) {
+        if (k.startsWith("wagmi") || k.startsWith("wc:") || k.startsWith("walletconnect")) {
           localStorage.removeItem(k);
         }
       });
@@ -55,8 +54,19 @@ export default function App() {
           </span>
         </div>
 
-        {/* keep Web3Modal button in the DOM (hidden) so we can click it programmatically */}
-        <w3m-button balance="hide" style={{ display: "none" }}></w3m-button>
+        {/* Keep exactly ONE Web3Modal button in the app. Hide it visually but keep it in layout. */}
+        <w3m-button
+          id="w3m-hidden"
+          balance="hide"
+          style={{
+            position: "absolute",
+            width: 0,
+            height: 0,
+            opacity: 0,
+            pointerEvents: "none",
+            overflow: "hidden"
+          }}
+        ></w3m-button>
 
         {/* Connect / Address */}
         <div className="wallet-wrap">
