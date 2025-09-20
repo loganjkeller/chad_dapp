@@ -1,5 +1,5 @@
 // src/App.jsx
-import "./wallet.js'
+import "./wallet.js';
 import "./styles.css";
 import "./index.css";
 import PresalePanel from "./PresalePanel";
