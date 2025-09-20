@@ -59,12 +59,7 @@ export default function App() {
 
         {/* Web3Modal’s connect button (registered in wallet.js) */}
         <w3m-button balance="hide"></w3m-button>
-		<button 
-  		onClick={resetWalletCache} 
-  		style={{ marginLeft: 8, fontSize: 12 }}
->
-  🔄 Reset
-</button>
+		
       </header>
 
       <main className="main">
