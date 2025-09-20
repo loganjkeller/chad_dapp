@@ -27,22 +27,51 @@ function resetWalletCacheAndOpen() {
   if (el) el.click();
 }
 
-function resetWalletCache() {
+function clearStaleWalletSession() {
   try {
-    Object.keys(localStorage).forEach((k) => {
-      if (k.includes("wagmi") || k.includes("wc@2")) {
-        localStorage.removeItem(k);
-      }
-    });
-    console.log("🔄 Cleared wallet session cache");
-  } catch (err) {
-    console.warn("Could not clear wallet cache", err);
-  }
+    const hasWC = Object.keys(localStorage).some((k) => k.startsWith('wc@2:'));
+    const wagmiStore = localStorage.getItem('wagmi.store');
+
+    // If wagmi or walletconnect think there's a session but no address in wagmi,
+    // that’s a stale session -> clear it.
+    let wagmiThinksConnected = false;
+    if (wagmiStore) {
+      try {
+        const s = JSON.parse(wagmiStore);
+        wagmiThinksConnected = s?.state?.data?.status === 'connected';
+      } catch {}
+    }
+    if (hasWC || wagmiThinksConnected) {
+      Object.keys(localStorage).forEach((k) => {
+        if (k.includes('wagmi') || k.startsWith('wc@2:')) localStorage.removeItem(k);
+      });
+      console.log('🔄 Cleared stale wallet session');
+    }
+  } catch {}
 }
 
 export default function App() {
   const chainId = useChainId();
   const onBnb = chainId === bsc.id;
+import { useEffect } from 'react';
+import { useAccount } from 'wagmi';
+
+// …inside App()
+const { address: acct } = useAccount();
+
+useEffect(() => {
+  // If there’s no connected address but cache says “connected”, nuke cache.
+  if (!acct) clearStaleWalletSession();
+}, [acct]);
+
+// Also when the tab regains focus (common on mobile after switching apps)
+useEffect(() => {
+  const onFocus = () => {
+    if (!acct) clearStaleWalletSession();
+  };
+  window.addEventListener('focus', onFocus);
+  return () => window.removeEventListener('focus', onFocus);
+}, [acct]);	
 
   return (
     <div className="shell">
