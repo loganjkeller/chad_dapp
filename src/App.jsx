@@ -5,7 +5,7 @@ import "./index.css";
 import PresalePanel from "./PresalePanel";
 
 
-import { useChainId } from "wagmi";
+import { useChainId, useAccount } from "wagmi";
 import { bsc } from "wagmi/chains";
 import { useAccount } from "wagmi";
 import { useEffect } from "react";
@@ -77,8 +77,21 @@ export default function App() {
           </span>
         </div>
 
-        {/* Web3Modal’s connect button (registered in wallet.js) */}
-        <w3m-button balance="hide"></w3m-button>
+        {/* Hidden Web3Modal button (kept for opening the modal) */}
+        <w3m-button balance="hide" style={{ display: "none" }}></w3m-button>
+
+        {/* Show address if connected; otherwise show a simple Connect button */}
+        {(() => {
+          const { address } = useAccount();
+          const openModal = () => document.querySelector("w3m-button")?.click();
+          return address ? (
+            <button onClick={openModal} className="btn secondary" title="Manage wallet">
+              {address.slice(0, 6)}…{address.slice(-4)}
+            </button>
+          ) : (
+            <button onClick={openModal} className="btn">Connect Wallet</button>
+          );
+        })()}
 		
       </header>
 
