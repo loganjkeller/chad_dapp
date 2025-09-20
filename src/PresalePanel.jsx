@@ -364,23 +364,7 @@ export default function PresalePanel() {
         {!address ? (
   <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
     <w3m-button balance="hide"></w3m-button>
-    <button onClick={openWallet} className="btn">Connect Wallet</button>
-
-    {/* tiny reset link */}
-    <button
-      onClick={resetWalletCacheAndOpen}
-      style={{
-        background: "transparent",
-        border: "none",
-        color: "#999",
-        fontSize: 12,
-        textDecoration: "underline",
-        cursor: "pointer"
-      }}
-      title="If your wallet doesn’t open, tap to reset the connection."
-    >
-      having trouble? reset wallet connection
-    </button>
+    <button onClick={openWallet} className="btn"><-</button>
   </div>
         ) : (
           <>
