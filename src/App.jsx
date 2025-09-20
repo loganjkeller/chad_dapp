@@ -7,7 +7,7 @@ import PresalePanel from "./PresalePanel";
 
 import { useChainId } from "wagmi";
 import { bsc } from "wagmi/chains";
-import { useAccount } from "wagmi";
+import { useAccount, useDisconnect } from "wagmi";
 import { useEffect } from "react";
 
 // If you have a logo file, keep this import.
@@ -55,7 +55,21 @@ function clearStaleWalletSession() {
 export default function App() {
   const chainId = useChainId();
   const onBnb = chainId === bsc.id;
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+
+  const openModal = () => document.querySelector("w3m-button")?.click();
+  const hardDisconnect = () => {
+    try {
+      disconnect?.(); // wagmi disconnect
+      // also clean any lingering walletconnect/wagmi cache
+      Object.keys(localStorage).forEach((k) => {
+        if (k.startsWith("wagmi") || k.startsWith("wc:") || k.startsWith("walletconnect")) {
+          localStorage.removeItem(k);
+        }
+      });
+    } catch {}
+  };	
 
   // Automatically clear stale sessions if no wallet is connected
   useEffect(() => {
@@ -77,21 +91,27 @@ export default function App() {
           </span>
         </div>
 
-        {/* Hidden Web3Modal button (kept for opening the modal) */}
+        {/* Keep the real Web3Modal button hidden; we drive it programmatically */}
         <w3m-button balance="hide" style={{ display: "none" }}></w3m-button>
 
-        {/* Show address if connected; otherwise show a simple Connect button */}
-        {(() => {
-          const { address } = useAccount();
-          const openModal = () => document.querySelector("w3m-button")?.click();
-          return address ? (
+        {isConnected ? (
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <button onClick={openModal} className="btn secondary" title="Manage wallet">
-              {address.slice(0, 6)}…{address.slice(-4)}
+              {address?.slice(0, 6)}…{address?.slice(-4)}
             </button>
-          ) : (
-            <button onClick={openModal} className="btn">Connect Wallet</button>
-          );
-        })()}
+            <button
+              onClick={hardDisconnect}
+              className="btn ghost"
+              aria-label="Disconnect"
+              title="Disconnect"
+              style={{ padding: "6px 10px" }}
+            >
+              ✕
+            </button>
+          </div>
+        ) : (
+          <button onClick={openModal} className="btn">Connect Wallet</button>
+        )}
 		
       </header>
 
