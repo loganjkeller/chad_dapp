@@ -368,7 +368,6 @@ export default function PresalePanel() {
 
       {/* Buy / Claim actions */}
       <div className="card" style={{ marginTop: 12 }}>
-         // Replace the disconnected UI with this:
 {!address ? (
   <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
     <button
