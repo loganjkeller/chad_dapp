@@ -651,6 +651,9 @@ This isn’t just a coin. This is a legend in the making.
           Be Chad. Stay Chad. Join the Movement.
         </h3>
         <div style={{ marginBottom: 12, marginTop: 50, }}>
+<a href="https://t.me/chadthecoin" target="_blank" rel="noopener noreferrer" className="btn" style={{ marginLeft: 12 }}>
+            Join Our Telegram
+          </a>
           <a href="https://x.com/chadthecoin?s=21&t=U7EIlDaHXQPRYNHY6Q50bw" target="_blank" rel="noopener noreferrer" className="btn" style={{ marginLeft: 12 }}>
             Follow on X
           </a>
